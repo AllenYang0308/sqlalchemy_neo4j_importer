@@ -1,0 +1,54 @@
+nodes:
+  - env: ETLSQL
+    model_name: User
+    formatter_conf:
+      model_name: CustomerModel
+      attrs:
+        fullname: 完整姓名 
+        age: 年齡 
+        idcode: 客戶編碼 
+    model_conditions:
+      - attr: name
+        value: WuVenArt
+    df_action_map:
+      deduplicates:
+        - 完整姓名
+        - 客戶編碼
+      remove_empty_rows:
+        - 完整姓名
+        - 客戶編碼
+    mode: and
+    merge_keys:
+      - 客戶 
+      - 完整姓名 
+    node_label:
+      - 客戶 
+  - env: ETLSQL
+    model_name: User
+    formatter_conf:
+      model_name: CustomerOtherModel
+      attrs:
+        name: 姓名 
+        idcode: 客戶編碼 
+    merge_keys:
+      - 客戶其他資訊 
+      - 姓名 
+    node_label:
+      - 客戶其他資訊 
+relations:
+  - env: ETLSQL
+    model_name: User 
+    relation_name: 客戶-其他資訊 
+    start_key: 完整姓名 
+    end_key: 姓名
+    formatter_conf:
+      model_name: CustomerRel
+      attrs:
+        fullname: 完整姓名 
+        name: 姓名 
+    start_node_key:
+      - 客戶 
+      - 完整姓名 
+    end_node_key:
+      - 客戶其他資訊 
+      - 姓名 

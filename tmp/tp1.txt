@@ -1,0 +1,9 @@
+MERGE (p2:人 {ID: $account_manager_code}) 
+SET p2.姓名 = $account_manager_name
+SET p2.帳管理專員編 = $account_manager_code
+SET p2.角色 = $role 
+
+MERGE (p3:人 {ID: $associated_customer_id})
+SET p3.姓名 = $associated_customer_name
+
+MERGE (p2)-[r1:客戶關係{客戶關係: $relationship, 樣態: $rtype}]-(p3)
