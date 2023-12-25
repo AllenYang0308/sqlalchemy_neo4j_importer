@@ -1,3 +1,4 @@
+import os
 import importlib
 from sqlalchemy import create_engine, or_, and_
 from sqlalchemy.orm import Session
@@ -8,13 +9,20 @@ class SQLUtils(object):
 
     def __init__(self, dbaccount, dbpasswd, db, host='127.0.0.1'):
 
+        dbpasswd = quote_plus(dbpasswd)
         self.engine = create_engine(
-            f"mysql+pymysql://{dbaccount}:{quote_plus(dbpasswd)}@{host}:3306/{db}?charset=utf8mb4",
+            os.getenv("dbengine").format(
+                dbaccount=dbaccount,
+                dbpasswd=dbpasswd,
+                host=host,
+                db=db
+            ),
             echo=False
         )
         self._set_session()
         self.query_model = None
         self.query = None
+        self.total = 0
 
     def _set_session(self):
         self.sess = Session(self.engine)
@@ -45,6 +53,7 @@ class SQLUtils(object):
         self._set_query()
 
     def get_all(self, conds=None):
+        self.total = self.query.filter(conds).count()
         return self.query.filter(conds).all()
 
     def get_query_conditions(self, base_model, model_name, mode, *conds):

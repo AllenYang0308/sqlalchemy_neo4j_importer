@@ -43,18 +43,6 @@ class MapGenerator(object):
                           node_label={}, df_action_map={}, mode="and",
                           model_conditions=[]):
 
-        # def df_actions(dataset, **kwargs):
-        #     actions = ("deduplicates", "filter_column", "remove_empty_rows")
-        #     for action, params in kwargs.items():
-        #         if action in actions:
-        #             if action == "deduplicates":
-        #                 dataset.dataframe.deduplicates(*params)
-        #             if action == "remove_empty_rows":
-        #                 dataset.dataframe.remove_empty_rows(*params)
-        #             if action == "filter_column":
-        #                 dataset.dataframe.filter_column(*params)
-        #     return dataset
-
         merge_labels = tuple(merge_label + merge_keys)
         df = SQLDataSet(
             **get_env(env),
@@ -79,17 +67,6 @@ class MapGenerator(object):
                                formatter_model="", formatter_conf={},
                                start_node_key=[], end_node_key=[], mode="and",
                                model_conditions=[]):
-        # def df_actions(dataset, **kwargs):
-        #     actions = ("deduplicates", "filter_column", "remove_empty_rows")
-        #     for action, params in kwargs.items():
-        #         if action in actions:
-        #             if action == "deduplicates":
-        #                 dataset.dataframe.deduplicates(*params)
-        #             if action == "remove_empty_rows":
-        #                 dataset.dataframe.remove_empty_rows(*params)
-        #             if action == "filter_column":
-        #                 dataset.dataframe.filter_column(*params)
-        #     return dataset
 
         df = SQLDataSet(
             **get_env(env),

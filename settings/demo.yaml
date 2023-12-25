@@ -7,9 +7,9 @@ nodes:
         fullname: 完整姓名 
         age: 年齡 
         idcode: 客戶編碼 
-    model_conditions:
-      - attr: name
-        value: WuVenArt
+          # model_conditions:
+          #   - attr: name
+          #     value: WuVenArt
     df_action_map:
       deduplicates:
         - 完整姓名
