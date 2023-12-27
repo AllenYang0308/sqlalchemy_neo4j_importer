@@ -52,9 +52,9 @@ class SQLUtils(object):
         self.query_model = self._get_query_model(base_model, model_name)
         self._set_query()
 
-    def get_all(self, conds=None):
+    def get_all(self, conds=None, offset=0, limit=10000):
         self.total = self.query.filter(conds).count()
-        return self.query.filter(conds).all()
+        return self.query.filter(conds).offset(offset).limit(limit).all()
 
     def get_query_conditions(self, base_model, model_name, mode, *conds):
         rsp = None

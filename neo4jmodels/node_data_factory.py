@@ -29,7 +29,7 @@ class NodeFormatter(object):
 
     def _set_formatter_by_config(self, formatter_conf={}):
         conf = dict()
-        for k,v in formatter_conf['attrs'].items():
+        for k, v in formatter_conf['attrs'].items():
             conf[k] = Field(v)
         self._formatter = type(formatter_conf['model_name'], (Model, ), conf)
 
@@ -53,15 +53,18 @@ class NodeFormatter(object):
 
 class SQLDataSet(NodeDataSet):
 
-    def __init__(self, host="", dbaccount="", dbpasswd="", db="",
+    def __init__(self, host, dbaccount, dbpasswd, db,
                  data_base_model="", model_name="", formatter_base_model="",
                  formatter_model="", formatter_conf={}, mode="and",
                  model_conditions=[]):
         self.sqldb = SQLUtils(dbaccount, dbpasswd, db, host)
         self.data_base_model = f"{data_base_model}.{model_name}"
-        self.sqldb.set_query_model(data_base_model, model_name)
+        self.sqldb.set_query_model(
+            f"{data_base_model}.{model_name}",
+            model_name
+        )
         self.query_conditions = self._get_conditions(
-            data_base_model, model_name, mode, *model_conditions
+            self.data_base_model, model_name, mode, *model_conditions
         )
         self.formatter = NodeFormatter(
             formatter_base_model, formatter_model, formatter_conf
@@ -87,19 +90,23 @@ class SQLDataSet(NodeDataSet):
     def dataframe(self):
         return self._dataframe
 
-    def get_data_frame_actor(self):
+    def get_data_frame_actor(self, offset=0, limit=10000):
         rsp = None
         if not self.formatter:
             rsp = self._result_to_dict(
                 self.sqldb.get_all(
-                    self.query_conditions
+                    self.query_conditions,
+                    offset,
+                    limit,
                 )
             )
         else:
             rsp = self.formatter.get_formatter_data(
                 self._result_to_dict(
                     self.sqldb.get_all(
-                        self.query_conditions
+                        self.query_conditions,
+                        offset,
+                        limit,
                     )
                 )
             )

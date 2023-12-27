@@ -38,11 +38,11 @@ class NeoMapBuilder(ABC):
 class MapGenerator(object):
 
     @staticmethod
-    def generat_node_data(env, model_name, formatter_model="",
+    def generat_node_data(env, model_name, offset=0, limit=10000,
+                          formatter_model="",
                           formatter_conf={}, merge_label=[], merge_keys=[],
                           node_label={}, df_action_map={}, mode="and",
                           model_conditions=[]):
-
         merge_labels = tuple(merge_label + merge_keys)
         df = SQLDataSet(
             **get_env(env),
@@ -52,7 +52,7 @@ class MapGenerator(object):
             mode=mode,
             model_conditions=model_conditions
         )
-        df.get_data_frame_actor()
+        df.get_data_frame_actor(offset, limit)
         df = df_actions(df, **df_action_map)
 
         return {
@@ -63,9 +63,11 @@ class MapGenerator(object):
 
     @staticmethod
     def generate_relation_data(env, model_name,
-                               relation_name, start_key, end_key,
+                               relation_name, start_key, end_key, offset=0,
+                               limit=10000,
                                formatter_model="", formatter_conf={},
-                               start_node_key=[], end_node_key=[], mode="and",
+                               start_node_key=[], end_node_key=[],
+                               df_action_map={}, mode="and",
                                model_conditions=[]):
 
         df = SQLDataSet(
@@ -76,7 +78,8 @@ class MapGenerator(object):
             mode=mode,
             model_conditions=model_conditions
         )
-        df.get_data_frame_actor()
+        df.get_data_frame_actor(offset, limit)
+        df = df_actions(df, **df_action_map)
         rel_data = [
             (x[start_key], x, x[end_key]) for x in df.dataframe.to_dict()
         ]

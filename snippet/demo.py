@@ -17,32 +17,23 @@ df_business = im_data.filter(
 df_business = df_business.drop_duplicates('business_id', keep='last')
 json_business = df_business.to_json(orient="records")
 dict_business = json.loads(json_business)
-# dict_business = dict_business[:10]
-# print("dict_business: ", dict_business)
-# dict_business = []
+print('business: ', len(dict_business))
 
 df_zip = im_data.filter(["zip"])
 df_zip = df_zip.drop_duplicates('zip', keep='last')
 json_zip = df_zip.to_json(orient="records")
 dict_zip = json.loads(json_zip)
-# dict_zip = dict_zip[:10]
-# print("dict_zip: ", dict_zip)
-# dict_zip = []
+print('zip: ', len( dict_zip ))
 
 df_person = im_data.filter(["user_name", "deviceID"])
 df_person = df_person.drop_duplicates('deviceID', keep='last')
 json_person = df_person.to_json(orient="records")
 dict_person = json.loads(json_person)
-# dict_person = dict_person[:10]
-# print("dict_person: ", dict_person)
-# dict_person = []
+print('person: ', len( dict_person ))
 
 df_relationship = im_data.filter(["business_id", "deviceID", "scan_timestamp"])
 json_relationship = df_relationship.to_json(orient="records")
 dict_relationship = json.loads(json_relationship)
-# dict_relationship = dict_relationship[:20]
-# print("dict_relationship: ", dict_relationship)
-# dict_relationship = []
 
 df_relationship_zip = im_data.filter(["business_id", "zip"])
 df_relationship_zip = df_relationship_zip.drop_duplicates(
@@ -55,10 +46,10 @@ dict_relationship_zip = json.loads(json_relationship_zip)
 
 
 graph = Graph(
-    "neo4j+s://cb219d50.databases.neo4j.io",
+    "neo4j+s://1b4e9707.databases.neo4j.io",
     auth=(
         "neo4j",
-        "MNDwf9g1xJ6_NLl8YSZ2P8J2YjkFQmPTd7WWB7v3kuY"
+        "VZWCC6OoZP44vsGxkkzchHLUhfbG4yEdn0D5ZNrCnOI"
     )
 )
 # graph.merge(dict_business, "Business", "business_id")
@@ -68,11 +59,8 @@ ss = merge_nodes(
     ("Business", "business_id"),
     labels={"Business"}
 )
-print(ss)
-print(graph.nodes.match("Business").count())
 
 merge_nodes(graph, dict_zip, ("Zip", "zip"), labels={"Zip"})
-print(graph.nodes.match("Zip").count())
 
 merge_nodes(
     graph.auto(),
@@ -80,7 +68,6 @@ merge_nodes(
     merge_key="deviceID",
     labels={"Person"}
 )
-print(graph.nodes.match("Person").count())
 
 
 ex_people = []

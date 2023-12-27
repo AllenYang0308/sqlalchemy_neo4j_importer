@@ -1,6 +1,10 @@
+description: Neo4j nodes and relations demo.
+serviceVersion: 1.0
+offset: 0
+limit: 5000 
 nodes:
   - env: ETLSQL
-    model_name: User
+    model_name: DemoUser
     formatter_conf:
       model_name: CustomerModel
       attrs:
@@ -12,7 +16,6 @@ nodes:
           #     value: WuVenArt
     df_action_map:
       deduplicates:
-        - 完整姓名
         - 客戶編碼
       remove_empty_rows:
         - 完整姓名
@@ -24,12 +27,15 @@ nodes:
     node_label:
       - 客戶 
   - env: ETLSQL
-    model_name: User
+    model_name: DemoUser
     formatter_conf:
       model_name: CustomerOtherModel
       attrs:
         name: 姓名 
         idcode: 客戶編碼 
+    df_action_map:
+      deduplicates:
+        - 客戶編碼 
     merge_keys:
       - 客戶其他資訊 
       - 姓名 
@@ -37,7 +43,7 @@ nodes:
       - 客戶其他資訊 
 relations:
   - env: ETLSQL
-    model_name: User 
+    model_name: DemoUser 
     relation_name: 客戶-其他資訊 
     start_key: 完整姓名 
     end_key: 姓名

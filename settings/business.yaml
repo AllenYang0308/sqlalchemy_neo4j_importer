@@ -1,0 +1,92 @@
+description: Neo4j nodes and relations demo (Business and customer).
+serviceVersion: 1.0
+offset: 0
+limit: 1000 
+nodes:
+  - env: ETLSQL
+    model_name: Business 
+    formatter_conf:
+      model_name: BusinessModel
+      attrs:
+        business_id: 公司代號
+        business_name: 公司名稱
+        business_address: 公司地址
+        latitude: 地區緯度
+        longitude: 地區經度
+    df_action_map:
+      deduplicates:
+        - 公司代號 
+      remove_empty_rows:
+        - 公司代號 
+    mode: and
+    merge_keys:
+      - 公司 
+      - 公司代號 
+    node_label:
+      - 公司 
+  - env: ETLSQL
+    model_name: Business
+    formatter_conf:
+      model_name: ZipModel
+      attrs:
+        bzip: 郵遞區號
+    df_action_map:
+      deduplicates:
+        - 郵遞區號
+    node_label:
+      - 郵遞區號
+    merge_keys:
+      - 郵遞區號
+      - 郵遞區號
+  - env: ETLSQL
+    model_name: Business
+    formatter_conf:
+      model_name: CustomerModel
+      attrs:
+        user_name: 客戶姓名
+        deviceID: 裝置ID
+    df_action_map:
+      deduplicates:
+        - 裝置ID
+    node_label:
+      - 客戶
+      - 裝置ID
+    merge_keys:
+      - 客戶
+      - 裝置ID
+relations:
+  - env: ETLSQL
+    model_name: Business 
+    relation_name: 公司-地理位置 
+    start_key: 公司代號 
+    end_key: 郵遞區號 
+    formatter_conf:
+      model_name: BusinessAreaRel
+      attrs:
+        business_id: 公司代號 
+        business_name: 公司名稱
+        business_address: 公司地址
+        bzip: 郵遞區號
+    start_node_key:
+      - 公司 
+      - 公司代號 
+    end_node_key:
+      - 郵遞區號 
+      - 郵遞區號
+  - env: ETLSQL
+    model_name: Business 
+    relation_name: 客戶到訪公司 
+    start_key: 裝置ID 
+    end_key: 公司代號
+    formatter_conf:
+      model_name: CustomerVisitRel
+      attrs:
+        business_id: 公司代號 
+        user_name: 客戶姓名
+        deviceID: 裝置ID
+    start_node_key:
+      - 客戶 
+      - 裝置ID 
+    end_node_key:
+      - 公司 
+      - 公司代號 

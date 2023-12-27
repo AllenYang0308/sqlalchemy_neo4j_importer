@@ -21,19 +21,18 @@ class DataFrameActor(object):
         self._df = df
 
     def deduplicates(self, *subsets):
-        self._df = self._df.drop_duplicates(subsets, keep="last")
-
-    # def deduplicates(self, field_name, *subsets):
-    #     self._df = self._df.drop_duplicates(
-    # subsets, keep="last") if subsets \
-    #         else self._df.drop_duplicates(field_name, keep="last")
+        if not self._df.empty:
+            self._df = self._df.drop_duplicates(
+                subset=list(subsets), keep="last"
+            )
 
     def get_frame_head(self):
         return tuple(self._df.head())
 
     def remove_empty_rows(self, *field_names):
-        for field_name in field_names:
-            self._df = self._df[~self._df[field_name].isnull()]
+        if not self._df.empty:
+            for field_name in field_names:
+                self._df = self._df[~self._df[field_name].isnull()]
 
     def filter_column(self, *columns):
         self._df = self._df.filter(columns)
