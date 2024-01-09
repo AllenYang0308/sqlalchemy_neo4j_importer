@@ -5,7 +5,9 @@ from neo4jmodels.node_data_factory import SQLDataSet
 from neo4jmodels.env import get_env
 
 
+# 傳入neo4j資枓集，kwargs參數集
 def df_actions(dataset, **kwargs):
+    # 支援動作列表(去管複、取出欄位、移除空值列資枓)
     actions = ("deduplicates", "filter_column", "remove_empty_rows")
     for action, params in kwargs.items():
         if action in actions:
@@ -123,20 +125,23 @@ class NeoMap(object):
 class ConcreteNeoMapbuilder(NeoMapBuilder):
 
     def __init__(self, neo_conn, neo_account, neo_token) -> None:
-        graph = Graph(
+        self.graph = Graph(
             neo_conn,
             auth=(
                 neo_account,
                 neo_token
             )
         )
-        self._neo_map = NeoMap(graph)
+        self._neo_map = NeoMap(self.graph)
 
     @property
     def NeoMap(self) -> NeoMap:
         return self._neo_map
 
     def add_nodes(self, data, merge_key, label={}) -> None:
+        index_query = f"CREATE INDEX {merge_key[0]} IF NOT EXISTS \
+            FOR (i: {merge_key[0]}) ON (i.{merge_key[1]})"
+        self.graph.run(index_query)
         self._neo_map.add_nodes(
             data, merge_key, label=label
         )
