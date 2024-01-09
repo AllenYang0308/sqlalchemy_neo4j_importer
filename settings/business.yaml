@@ -1,7 +1,7 @@
 description: Neo4j nodes and relations demo (Business and customer).
 serviceVersion: 1.0
 offset: 0
-limit: 1000 
+limit: 20000 
 nodes:
   - env: ETLSQL
     model_name: Business 
