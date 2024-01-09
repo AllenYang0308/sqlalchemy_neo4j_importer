@@ -1,5 +1,6 @@
 import os
 import importlib
+import datetime
 from sqlalchemy import create_engine, or_, and_
 from sqlalchemy.orm import Session
 from urllib.parse import quote_plus
@@ -17,6 +18,8 @@ class SQLUtils(object):
                 host=host,
                 db=db
             ),
+            pool_size=10,
+            max_overflow=0,
             echo=False
         )
         self._set_session()
@@ -56,15 +59,44 @@ class SQLUtils(object):
         self.total = self.query.filter(conds).count()
         return self.query.filter(conds).offset(offset).limit(limit).all()
 
-    def get_query_conditions(self, base_model, model_name, mode, *conds):
+    def get_query_conditions(
+        self,
+        base_model,
+        model_name,
+        mode,
+        *conds
+    ):
         rsp = None
         query_parameters = list()
         for cond in conds:
+            delta_day = None
+            operation = cond.get("operation", "eq")
+            value_type = cond.get("value_type", "str")
+            cond_value = cond.get("value", "")
             q_model = self._get_query_model(
                 base_model, model_name, cond.get('attr')
             )
-            if q_model:
-                query_parameters.append(q_model == cond.get("value"))
+
+            if value_type == 'DateTime':
+                nt = datetime.datetime.now()
+                yt = datetime.timedelta(days=cond.get("value"))
+                delta_day = nt - yt
+                cond_value = datetime.datetime(
+                    year=delta_day.year, month=delta_day.month,
+                    day=delta_day.day, hour=0, minute=0
+                )
+            if operation == "eq" and q_model:
+
+                query_parameters.append(q_model == cond_value)
+            if operation == "lt" and q_model:
+                query_parameters.append(q_model < cond_value)
+            if operation == "gt" and q_model:
+                query_parameters.append(q_model > cond_value)
+            if operation == "lte" and q_model:
+                query_parameters.append(q_model <= cond_value)
+            if operation == "gte" and q_model:
+                query_parameters.append(q_model >= cond_value)
+
         if mode == "or":
             rsp = or_(*query_parameters)
         if mode == "and":
