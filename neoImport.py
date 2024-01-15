@@ -69,6 +69,7 @@ if __name__ == '__main__':
         limit = int(conf.get("limit", 10000))
 
         while True:
+
             try:
                 conf.update({'offset': offset, 'limit': limit})
                 data_set_creator = DataSetCreator(conf)
@@ -101,7 +102,7 @@ if __name__ == '__main__':
             if retry_times > 5:
                 break
 
-    if retry_times > 5:
+    if retry_times <= 5:
         msg = {
             "file": settings_file,
             "status": "successful.",
